@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_app/data/join_or_login.dart';
+import 'package:test_app/screens/forget_pw.dart';
 
 import '../helper/login_background.dart';
 
@@ -152,7 +153,13 @@ class AuthPage extends StatelessWidget {
                 Consumer<JoinOrLogin>(builder: (context, joinOrlogin, child) {
                   return Opacity(
                       opacity: joinOrlogin.isJoin ? 0 : 1,
-                      child: Text("Forgot Password"));
+                      child: GestureDetector(
+                          onTap: joinOrlogin.isJoin
+                              ? null
+                              : () {
+                                  goToForgetPw(context);
+                                },
+                          child: Text("Forgot Password")));
                 })
               ],
             ),
@@ -160,6 +167,11 @@ class AuthPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  goToForgetPw(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ForgetPw()));
   }
 
   Widget _authButton(Size size) {
