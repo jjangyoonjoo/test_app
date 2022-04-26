@@ -12,7 +12,7 @@ class MainPage extends StatelessWidget {
         appBar: AppBar(title: Text(email)),
         body: Container(
           child: Center(
-            child: FlatButton(
+            child: ElevatedButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
                 },
