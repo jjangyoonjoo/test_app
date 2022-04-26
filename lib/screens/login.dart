@@ -63,28 +63,27 @@ class AuthPage extends StatelessWidget {
   }
 
   void _register(BuildContext context) async {
-    final UserCredential result = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text);
-    final User? user = result.user;
 
-    if (user == null) {
-      final snacBar = SnackBar(content: Text('Please try again later.'));
-      Scaffold.of(context).showSnackBar(snacBar);
+    try {
+      final UserCredential result = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text);
+    } catch(e) {
+        final snackBar = SnackBar(content: Text(e.toString()));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 //    Navigator.push(context,
 //        MaterialPageRoute(builder: (context) => MainPage(email: user?.email)));
   }
 
   void _login(BuildContext context) async {
-    final UserCredential result = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text);
-    final User? user = result.user;
-
-    if (user == null) {
-      final snacBar = SnackBar(content: Text('Please try again later.'));
-      Scaffold.of(context).showSnackBar(snacBar);
+    try {
+      final UserCredential result = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text);
+    } catch (e) {
+      final snackBar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 //    Navigator.push(context,
 //        MaterialPageRoute(builder: (context) => MainPage(email: user?.email)));
@@ -182,9 +181,12 @@ class AuthPage extends StatelessWidget {
       child: SizedBox(
         height: 50,
         child: Consumer<JoinOrLogin>(
-          builder: (context, joinOrLogin, child) => RaisedButton(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          builder: (context, joinOrLogin, child) => ElevatedButton(
+            style:
+                ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                  primary: joinOrLogin.isJoin ? Colors.red : Colors.blue,
+                ),
             child: Text(
               joinOrLogin.isJoin ? 'Join' : 'Login',
               style: TextStyle(fontSize: 20, color: Colors.white),
@@ -194,7 +196,7 @@ class AuthPage extends StatelessWidget {
                 joinOrLogin.isJoin ? _register(context) : _login(context);
               }
             },
-            color: joinOrLogin.isJoin ? Colors.red : Colors.blue,
+
           ),
         ),
       ),

@@ -38,9 +38,9 @@ class _ForgetPwState extends State<ForgetPw> {
                     FirebaseAuth.instance
                         .sendPasswordResetEmail(email: _emailController.text)
                         .whenComplete(() {
-                      SnackBar snacBar = SnackBar(
+                      SnackBar snackBar = SnackBar(
                           content: Text('Check your email for pw reset.'));
-                      Scaffold.of(_formKey.currentContext!).showSnackBar(snacBar);
+                      ScaffoldMessenger.of(_formKey.currentContext!).showSnackBar(snackBar);
                     });
                   },
                   child: Text('Reset Password'))
