@@ -11,12 +11,16 @@ class MainPage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(title: Text(email)),
         body: Container(
-          child: Center(
-            child: ElevatedButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                },
-                child: Text("Logout")),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(FirebaseAuth.instance.currentUser.toString()),
+              ElevatedButton(
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                  },
+                  child: Text("Logout")),
+            ],
           ),
         ));
   }

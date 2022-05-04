@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_app/data/join_or_login.dart';
 import 'package:test_app/screens/forget_pw.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../helper/login_background.dart';
 
@@ -173,32 +174,75 @@ class AuthPage extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => ForgetPw()));
   }
 
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    print("google Auth: " +  googleAuth.toString());
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   Widget _authButton(Size size) {
     return Positioned(
       left: size.width * 0.15,
       right: size.width * 0.15,
       bottom: 0,
-      child: SizedBox(
-        height: 50,
-        child: Consumer<JoinOrLogin>(
-          builder: (context, joinOrLogin, child) => ElevatedButton(
-            style:
+      child: Column(
+        children: [
+          SizedBox(
+            height: 50,
+            width: size.width,
+            child: Consumer<JoinOrLogin>(
+              builder: (context, joinOrLogin, child) => ElevatedButton(
+                style:
+                    ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      primary: joinOrLogin.isJoin ? Colors.red : Colors.blue,
+                    ),
+                child: Text(
+                  'google',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                onPressed: signInWithGoogle,
+
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            width: size.width,
+            child: Consumer<JoinOrLogin>(
+              builder: (context, joinOrLogin, child) => ElevatedButton(
+                style:
                 ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   primary: joinOrLogin.isJoin ? Colors.red : Colors.blue,
                 ),
-            child: Text(
-              joinOrLogin.isJoin ? 'Join' : 'Login',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                joinOrLogin.isJoin ? _register(context) : _login(context);
-              }
-            },
+                child: Text(
+                  joinOrLogin.isJoin ? 'Join' : 'Login',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    joinOrLogin.isJoin ? _register(context) : _login(context);
+                  }
+                },
 
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
