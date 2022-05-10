@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_app/screens/auth.dart';
+import 'package:test_app/screens/profile.dart';
 
 import 'data/join_or_login.dart';
 import 'screens/login.dart';
@@ -64,7 +65,7 @@ class MyApp extends StatelessWidget {
                   stream: FirebaseAuth.instance.authStateChanges(),
                   builder: (context, snapshot) {
                     if(snapshot.hasData) {
-                      return MainPage(email: snapshot.data!.email!);
+                      return const ProfilePage();
                     }
                     return AuthGate();
                   },
