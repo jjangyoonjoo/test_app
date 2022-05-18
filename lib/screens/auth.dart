@@ -6,6 +6,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:jwt_decode/jwt_decode.dart';
+// import the io version
+import 'package:openid_client/openid_client_io.dart';
+// use url launcher package
+import 'package:url_launcher/url_launcher.dart';
 
 typedef OAuthSignIn = void Function();
 
@@ -35,6 +40,9 @@ class _AuthGateState extends State<AuthGate> {
 
   bool isLoading = false;
   AuthMode mode = AuthMode.login;
+  String? userAccessToken = '';
+  String? userRefreshToken = '';
+  String? userName ='';
 
   void setIsLoading() {
     setState(() {
@@ -180,7 +188,7 @@ class _AuthGateState extends State<AuthGate> {
                           ),
                         ),
                         TextButton(
-                          onPressed: _resetPassword,
+                          onPressed: authenticate,
                           child: const Text('Forgot password?'),
                         ),
                         RichText(
@@ -234,6 +242,49 @@ class _AuthGateState extends State<AuthGate> {
         ),
       ),
     );
+  }
+
+  Future authenticate() async {
+    // keyclock url : key-clock-url : example : http://localhost:8080
+    // my realm : name of your real.m
+    var uri = Uri.parse('http://10.0.2.2:9080/auth/realms/survey');
+    // your client id
+    var clientId = 'web_app';
+    var scopes = List<String>.of(['openid', 'profile', 'email']);
+    var port = 5000;
+    var issuer = await Issuer.discover(uri);
+    var client = new Client(issuer, clientId, clientSecret: clientId);
+    print(issuer.metadata);
+    urlLauncher(String url) async {
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+      } else {
+        throw 'Could not launch $Uri.parse(url)';
+      }
+    }
+    var authenticator = new Authenticator(
+      client,
+      scopes: scopes,
+      port: port,
+      urlLancher: urlLauncher,
+    );
+    var c = await authenticator.authorize();
+    closeInAppWebView();
+    var token = await c.getTokenResponse();
+    var userInformation = await c.getUserInfo();
+    setState(() {
+      userAccessToken = token.accessToken;
+      userRefreshToken = token.refreshToken;
+      print (userRefreshToken);
+      userName = userInformation.preferredUsername;
+    });
+    //print(token);
+    //return token;
+    Map<String, dynamic> payload = Jwt.parseJwt(userAccessToken!);
+
+    print(payload);
+
+
   }
 
   Future _resetPassword() async {
